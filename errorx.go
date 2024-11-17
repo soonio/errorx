@@ -33,17 +33,6 @@ func New(message string, code ...int64) *Error {
 }
 
 func If(err error) error { // 返回类型约束不能为*Error，会导致返回值变成type为*Error的nil
-	if err != nil {
-		return New(err.Error()).Caller(2)
-	}
-	return nil
-}
-
-func Must(err error) *Error {
-	return New(err.Error()).Caller(2)
-}
-
-func Wrap(err error) *Error {
 	if err == nil {
 		return nil
 	}
@@ -54,6 +43,13 @@ func Wrap(err error) *Error {
 	return New(err.Error()).Caller(2)
 }
 
+func Must(err error) *Error {
+	var e *Error
+	if errors.As(err, &e) {
+		return e
+	}
+	return New(err.Error()).Caller(2)
+}
 func Unknown(message string) *Error {
 	return (&Error{Code: UnknownErr, Message: message}).Caller(2)
 }
